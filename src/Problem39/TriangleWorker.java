@@ -16,10 +16,10 @@ public class TriangleWorker implements Callable<Set<Triangle>> {
     public Set<Triangle> call() {
         //System.out.println("Thread with perimeter " + p + " started!");
         Set<Triangle> triangles = new HashSet<>();
-        for(int a = 1; a < p/3; a++) {
+        for(int a = 1; a < (p>>2); a++) {
             int pa = p-a;
             int aSquared = a*a;
-            for(int b = a; b < pa/2; b++) {
+            for(int b = a; b < (pa>>1); b++) {
                 int bSquared = b*b;
                 int c = pa - b;
                 if(aSquared + bSquared == c*c) {
