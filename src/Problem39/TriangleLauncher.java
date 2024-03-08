@@ -13,16 +13,17 @@ public class TriangleLauncher {
             t.setPriority(Thread.MAX_PRIORITY);
             return t;
         });
-        List<TriangleWorker> workers = new ArrayList<>();
+        TriangleWorker[] workersArray = new TriangleWorker[991];
 
-        for(int i = 10; i <= 1000; i++) {
-            workers.add(new TriangleWorker(i));
+        for(int i = 0; i <= 990; i++) {
+            workersArray[i] = new TriangleWorker(i+10);
         }
 
         Set<Triangle> largestTriangles = new HashSet<>();
 
         try {
-            List<Future<Set<Triangle>>> future = pool.invokeAll(workers);
+            List<Future<Set<Triangle>>> future = pool.invokeAll(Arrays.stream(workersArray).toList());
+            pool.shutdown();
             for(Future<Set<Triangle>> triangles : future) {
                 Set<Triangle> t = triangles.get();
                 if(t.size() < largestTriangles.size()) continue;

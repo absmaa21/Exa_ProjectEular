@@ -23,7 +23,7 @@ public class TriangleWorker implements Callable<Set<Triangle>> {
                 int bSquared = b*b;
                 int c = pa - b;
                 if(aSquared + bSquared == c*c) {
-                    triangles.add(new Triangle(a,b,c));
+                    triangles.add(new Triangle(a,b,c,p));
                 }
             }
         }

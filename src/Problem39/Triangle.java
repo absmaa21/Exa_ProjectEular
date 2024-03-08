@@ -8,23 +8,11 @@ public class Triangle {
     private final int sideC;
     private int p;
 
-    public Triangle(int sideA, int sideB, int sideC) {
+    public Triangle(int sideA, int sideB, int sideC, int p) {
         this.sideA = sideA;
         this.sideB = sideB;
         this.sideC = sideC;
-        this.p = sideA + sideB + sideC;
-    }
-
-    public int getSideA() {
-        return sideA;
-    }
-
-    public int getSideB() {
-        return sideB;
-    }
-
-    public int getSideC() {
-        return sideC;
+        this.p = p;
     }
 
     public int getP() {
