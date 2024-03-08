@@ -1,19 +1,31 @@
 package Problem39;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
 public class TriangleWorker implements Callable<Set<Triangle>> {
 
-    private int p;
+    private final int p;
 
     public TriangleWorker(int p) {
         this.p = p;
     }
 
     @Override
-    public Set<Triangle> call() throws Exception {
+    public Set<Triangle> call() {
         System.out.println("Thread with perimeter " + p + " started!");
-        return null;
+        Set<Triangle> triangles = new HashSet<>();
+        for(int a = 1; a < p; a++) {
+            for(int b = a; b < p; b++) {
+                for(int c = b; c < p; c++) {
+                    if(a*a + b*b == c*c && a+b+c == p) {
+                        triangles.add(new Triangle(a,b,c));
+                    }
+                }
+            }
+        }
+
+        return triangles;
     }
 }

@@ -1,5 +1,7 @@
 package Problem39;
 
+import java.util.Objects;
+
 public class Triangle {
     private final int sideA;
     private final int sideB;
@@ -25,13 +27,20 @@ public class Triangle {
         return sideC;
     }
 
-    public boolean equals(Triangle o) {
-        if(sideA == o.getSideA() || sideA == o.getSideB() || sideA == o.getSideC())
-            return true;
+    public int getP() {
+        return p;
+    }
 
-        if(sideB == o.getSideA() || sideB == o.getSideB() || sideB == o.getSideC())
-            return true;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Triangle triangle = (Triangle) o;
+        return sideA == triangle.sideA && sideB == triangle.sideB && sideC == triangle.sideC && p == triangle.p;
+    }
 
-        return sideC == o.getSideA() || sideC == o.getSideB() || sideC == o.getSideC();
+    @Override
+    public int hashCode() {
+        return Objects.hash(sideA + sideB + sideC);
     }
 }
