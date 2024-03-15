@@ -21,10 +21,8 @@ public class SudokuLauncher {
             int currentY = 0;
             for (String line : reader.lines().toList()) {
                 if (line.startsWith("Grid")) {
-                    if (currentSudoku != null) {
+                    if (currentSudoku != null)
                         sudokuList.add(currentSudoku);
-                        //Logger.getInstance().log(currentSudoku);
-                    }
                     currentSudoku = new int[9][9];
                     currentY = 0;
                 } else {
@@ -54,23 +52,6 @@ public class SudokuLauncher {
         try {
             for (Future<Integer> x : pool.invokeAll(workers))
                 sum += x.get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
-        }
-
-        pool.shutdown();
-        return sum;
-    }
-
-    private int runOneSudokuCalculation(int[][] sudoku) {
-        int sum = 0;
-
-        ExecutorService pool = Executors.newFixedThreadPool(1);
-        List<SudokuWorker> workers = new ArrayList<>();
-        workers.add(new SudokuWorker(sudoku));
-
-        try {
-            pool.invokeAny(workers);
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
