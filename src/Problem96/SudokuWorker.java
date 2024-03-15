@@ -16,6 +16,10 @@ public class SudokuWorker implements Callable<Integer> {
 
     public SudokuWorker(int[][] sudoku) {
         this.sudoku = sudoku;
+        initialize();
+    }
+
+    private void initialize() {
         for (int i = 0; i < 9; i++) {
             grid[i] = new HashSet<>();
             col[i] = new HashSet<>();
@@ -49,52 +53,58 @@ public class SudokuWorker implements Callable<Integer> {
             }
 
             int lastPosition = position;
-            position += insertPossibleNumber(position, sudoku[getX(position)][getY(position)]);
+            position += insertPossibleNumber(position, sudoku[getCol(position)][getRow(position)]);
 
-            if (lastPosition > position && wasInit[getX(position)][getY(position)]) {
-                //logger.log("Go multiple back");
-                while (wasInit[getX(position)][getY(position)]) {
-                    position--;
-                }
+            if (lastPosition > position && wasInit[getCol(position)][getRow(position)]) {
+                position = backtrack(position);
                 continue;
             }
 
             if (position == 81 && !isSolved()) {
                 logger.log("Sudoku has problems at last position.");
                 logger.log(sudoku, wasInit);
-                position--;
+                position = backtrack(position);
             }
 
             if (position == 81) {
-                if (isSolved()) {
-                    logger.log("A Sudoku was solved! It took only " + (new Date().getTime() - startTimeOfWorker.getTime()) + "ms");
-                    return sudoku[0][0] * 100 + sudoku[1][0] * 10 + sudoku[2][0];
-                }
+                if (isSolved())
+                    return calculateSolutionValue();
                 logger.log("Sudoku was not possible to solve!");
                 return 0;
             }
         }
 
-        logger.log("A Sudoku was solved! It took only " + (new Date().getTime() - startTimeOfWorker.getTime()) / 1000 + "s");
+        return calculateSolutionValue();
+    }
+
+    private int backtrack(int position) {
+        while (wasInit[getCol(position)][getRow(position)]) {
+            position--;
+        }
+        return position;
+    }
+
+    private int calculateSolutionValue() {
+        logger.log("A Sudoku was solved! It took only " + (new Date().getTime() - startTimeOfWorker.getTime()) + "ms");
         return sudoku[0][0] * 100 + sudoku[1][0] * 10 + sudoku[2][0];
     }
 
     private int insertPossibleNumber(int position, int startNum) {
-        if (wasInit[getX(position)][getY(position)])
+        if (wasInit[getCol(position)][getRow(position)])
             return 1;
 
         if (startNum > 0) {
-            row[getY(position)].remove(startNum);
-            col[getX(position)].remove(startNum);
+            row[getRow(position)].remove(startNum);
+            col[getCol(position)].remove(startNum);
             grid[getGridNum(position)].remove(startNum);
-            sudoku[getX(position)][getY(position)] = 0;
+            sudoku[getCol(position)][getRow(position)] = 0;
         }
 
         for (int i = startNum + 1; i <= 9; i++) {
-            if (!row[getY(position)].contains(i) && !col[getX(position)].contains(i) && !grid[getGridNum(position)].contains(i)) {
-                sudoku[getX(position)][getY(position)] = i;
-                row[getY(position)].add(i);
-                col[getX(position)].add(i);
+            if (!row[getRow(position)].contains(i) && !col[getCol(position)].contains(i) && !grid[getGridNum(position)].contains(i)) {
+                sudoku[getCol(position)][getRow(position)] = i;
+                row[getRow(position)].add(i);
+                col[getCol(position)].add(i);
                 grid[getGridNum(position)].add(i);
                 return 1;
             }
@@ -116,14 +126,14 @@ public class SudokuWorker implements Callable<Integer> {
     }
 
     private int getGridNum(int position) {
-        return (getX(position) / 3) + (getY(position) / 3) * 3;
+        return (getCol(position) / 3) + (getRow(position) / 3) * 3;
     }
 
-    private int getX(int position) {
+    private int getCol(int position) {
         return position % 9;
     }
 
-    private int getY(int position) {
+    private int getRow(int position) {
         return position / 9;
     }
 }
