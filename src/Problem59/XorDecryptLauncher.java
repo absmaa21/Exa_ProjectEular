@@ -34,23 +34,13 @@ public class XorDecryptLauncher {
         for(int i = 0; i < workersArray.length; i++)
             workersArray[i] = new XorDecryptWorker((char)(i + 97), cipherAscii);
 
-        List<Future<String>> returnedKeys = new ArrayList<>();
         try {
-            returnedKeys = pool.invokeAll(Arrays.stream(workersArray).toList());
-        } catch (InterruptedException | RuntimeException e) {
-            System.out.println("A thread stopped and has not found a valid key.");
+            return pool.invokeAny(Arrays.stream(workersArray).toList());
+        } catch (InterruptedException | ExecutionException e) {
+            System.out.println(e.getMessage());
         }
-        
-        if(!returnedKeys.isEmpty())
-            try {
-                for(Future<String> key : returnedKeys) {
-                    if(key.get() != null) return key.get();
-                }
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
 
-        return null;
+        return "NO_KEY_FOUND";
     }
 
     public static void main(String[] args) {

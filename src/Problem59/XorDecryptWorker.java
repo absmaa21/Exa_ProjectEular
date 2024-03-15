@@ -41,7 +41,7 @@ public class XorDecryptWorker implements Callable<String> {
             }
         }
 
-        return null;
+        throw new RuntimeException("No key found");
     }
 
     private StringBuilder decryptWithKey(byte[] key) {
