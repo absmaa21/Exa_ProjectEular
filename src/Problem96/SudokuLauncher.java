@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -20,15 +21,16 @@ public class SudokuLauncher {
             int currentY = 0;
             for (String line : reader.lines().toList()) {
                 if (line.startsWith("Grid")) {
-                    if (currentSudoku != null)
+                    if (currentSudoku != null) {
                         sudokuList.add(currentSudoku);
+                        //Logger.getInstance().log(currentSudoku);
+                    }
                     currentSudoku = new int[9][9];
                     currentY = 0;
                 } else {
                     for (int i = 0; i < 9; i++) {
-                        char c = line.charAt(i);
-                        if (Character.isDigit(c) && currentSudoku != null)
-                            currentSudoku[i][currentY] = c;
+                        if (currentSudoku == null) currentSudoku = new int[9][9];
+                        currentSudoku[i][currentY] = Character.getNumericValue(line.charAt(i));
                     }
                     currentY++;
                 }
@@ -41,16 +43,13 @@ public class SudokuLauncher {
         return sudokuList;
     }
 
-    private int runSudokuCalculationBacktracking(List<int[][]> sudokuList) {
-        // User preference
-        boolean USE_GOOD_SOLUTION = false;
-
+    private int runSudokuCalculation(List<int[][]> sudokuList) {
         int sum = 0;
 
         ExecutorService pool = Executors.newFixedThreadPool(sudokuList.size());
         List<SudokuWorker> workers = new ArrayList<>();
         for (int[][] sudoku : sudokuList)
-            workers.add(new SudokuWorker(sudoku, USE_GOOD_SOLUTION));
+            workers.add(new SudokuWorker(sudoku));
 
         try {
             for (Future<Integer> x : pool.invokeAll(workers))
@@ -63,9 +62,28 @@ public class SudokuLauncher {
         return sum;
     }
 
+    private int runOneSudokuCalculation(int[][] sudoku) {
+        int sum = 0;
+
+        ExecutorService pool = Executors.newFixedThreadPool(1);
+        List<SudokuWorker> workers = new ArrayList<>();
+        workers.add(new SudokuWorker(sudoku));
+
+        try {
+            pool.invokeAny(workers);
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+
+        pool.shutdown();
+        return sum;
+    }
+
     public static void main(String[] args) {
+        Date startTime = new Date();
         SudokuLauncher launcher = new SudokuLauncher();
         List<int[][]> sudokuList = launcher.loadData();
-        System.out.println("Sum is: " + launcher.runSudokuCalculationBacktracking(sudokuList));
+        System.out.println("Sum is: " + launcher.runSudokuCalculation(sudokuList));
+        System.out.println("The calculation time was: " + (new Date().getTime() - startTime.getTime()) + "ms");
     }
 }
