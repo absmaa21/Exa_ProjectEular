@@ -34,13 +34,15 @@ public class XorDecryptLauncher {
         for(int i = 0; i < workersArray.length; i++)
             workersArray[i] = new XorDecryptWorker((char)(i + 97), cipherAscii);
 
+        String correctKey = null;
         try {
-            return pool.invokeAny(Arrays.stream(workersArray).toList());
+            correctKey = pool.invokeAny(Arrays.stream(workersArray).toList());
         } catch (InterruptedException | ExecutionException e) {
             System.out.println(e.getMessage());
         }
 
-        return "NO_KEY_FOUND";
+        pool.shutdown();
+        return correctKey;
     }
 
     public static void main(String[] args) {
